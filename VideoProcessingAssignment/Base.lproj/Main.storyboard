@@ -37,11 +37,24 @@
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lu5-wp-qhl">
+                                <rect key="frame" x="207" y="388" width="187" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="HlC-bX-k7F"/>
+                                    <constraint firstAttribute="width" constant="187" id="X5z-Vf-z8o"/>
+                                </constraints>
+                                <state key="normal" title="Play Last Video"/>
+                                <connections>
+                                    <action selector="onClickOfPickLastVideoButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ipl-Qz-AhQ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="vDk-Dj-7JJ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="87G-zH-61Z"/>
+                            <constraint firstItem="lu5-wp-qhl" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="9NI-bR-SYo"/>
                             <constraint firstItem="HhP-9i-LFP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="FJv-Bw-DSD"/>
+                            <constraint firstItem="lu5-wp-qhl" firstAttribute="top" secondItem="HhP-9i-LFP" secondAttribute="bottom" constant="22" id="TV3-RG-pCO"/>
                             <constraint firstItem="HhP-9i-LFP" firstAttribute="top" secondItem="vDk-Dj-7JJ" secondAttribute="bottom" constant="30" id="qhh-28-RnD"/>
                             <constraint firstAttribute="trailing" secondItem="HhP-9i-LFP" secondAttribute="trailing" constant="10" id="rmB-fs-u9x"/>
                             <constraint firstItem="vDk-Dj-7JJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="zfQ-oa-rIz"/>

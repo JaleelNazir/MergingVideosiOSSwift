@@ -14,6 +14,7 @@ import MediaPlayer
 class ViewController: UIViewController {
     
     @IBOutlet var informationLabel : UILabel!
+    var filePath: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +43,7 @@ class ViewController: UIViewController {
                 dispatch_async(dispatch_get_main_queue(), {
                     self.informationLabel.text = "Now importing videos into application"
                 })
-                asset.writeAVToFile(filePath, presetName: AVAssetExportPresetHighestQuality, completeBlock: { (success) in
+                asset.writeAVToFile(filePath, presetName: AVAssetExportPreset1280x720, completeBlock: { (success) in
                     if success{
                         print("video imported to \(filePath)")
                         importedFilesCounter += 1
@@ -60,6 +61,16 @@ class ViewController: UIViewController {
         self.presentViewController(pickerController, animated: true) {}
     }
     
+    @IBAction func onClickOfPickLastVideoButton(sender:AnyObject){
+        if filePath != nil {
+            dispatch_async(dispatch_get_main_queue(), {
+                let moviePlayerViewController = MPMoviePlayerViewController(contentURL: NSURL(fileURLWithPath: self.filePath))
+                self.presentViewController(moviePlayerViewController, animated: true) {}
+                moviePlayerViewController.moviePlayer.play()
+            })
+        }
+    }
+    
     func checkVideosAndMerge(videoFilePaths:NSMutableArray) {
         self.informationLabel.text = "Video imported ! merging them now"
         AksVideoProcessingHelper.sharedInstance.mergeVideos(videoFilePaths, completion: { (returnedData) in
@@ -68,6 +79,7 @@ class ViewController: UIViewController {
                 self.presentViewController(moviePlayerViewController, animated: true) {}
                 moviePlayerViewController.moviePlayer.play()
                 self.informationLabel.text = "Merging completed and New video has been saved in Photos Library"
+                self.filePath = returnedData as! String
             })
         })
     }

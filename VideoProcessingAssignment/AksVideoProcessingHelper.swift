@@ -13,6 +13,8 @@ import AssetsLibrary
 
 typealias AKSVideoProcessingHelperCompletionBlock = (returnedData :AnyObject?) ->()
 
+let fixedVideoSize = CGSizeMake(1280,720)
+
 class AksVideoProcessingHelper: NSObject{
     var completionBlock: AKSVideoProcessingHelperCompletionBlock?
     var assetsArray = NSMutableArray()
@@ -72,7 +74,7 @@ class AksVideoProcessingHelper: NSObject{
             let mainCompositionInstruction = AVMutableVideoComposition()
             mainCompositionInstruction.instructions = NSArray(object: mainInstruction) as! [AVVideoCompositionInstructionProtocol]
             mainCompositionInstruction.frameDuration = CMTimeMake(1, 30)
-            mainCompositionInstruction.renderSize = CGSizeMake(320.0,480.0)
+            mainCompositionInstruction.renderSize = fixedVideoSize
             
             let filePath = getNewFilePathToSaveVideo()
             let exporter = AVAssetExportSession(asset: mixComposition, presetName: AVAssetExportPresetHighestQuality)
@@ -82,7 +84,7 @@ class AksVideoProcessingHelper: NSObject{
             exporter?.exportAsynchronouslyWithCompletionHandler({
                 self.completionBlock!(returnedData: filePath)
                 if exporter?.status == AVAssetExportSessionStatus.Completed{
-                    let saveToPhotos = false
+                    let saveToPhotos = true
                     if saveToPhotos {
                         let library = ALAssetsLibrary()
                         if library.videoAtPathIsCompatibleWithSavedPhotosAlbum(exporter?.outputURL){
@@ -118,19 +120,22 @@ class AksVideoProcessingHelper: NSObject{
     private func prepareVideoCompositionInstruction(track: AVCompositionTrack, asset: AVAsset) -> AVMutableVideoCompositionLayerInstruction {
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: track)
         let assetTrack = asset.tracksWithMediaType(AVMediaTypeVideo)[0]
-        
         let transform = assetTrack.preferredTransform
         let assetInfo = getVideoOrientationFromTransform(transform)
         
-        var scaleToFitRatio = UIScreen.mainScreen().bounds.width / assetTrack.naturalSize.width
+        var scaleToFitRatio = 0.0 as CGFloat
         if assetInfo.isPortrait {
-            scaleToFitRatio = UIScreen.mainScreen().bounds.width / assetTrack.naturalSize.height
+            scaleToFitRatio = fixedVideoSize.height / assetTrack.naturalSize.width
             let scaleFactor = CGAffineTransformMakeScale(scaleToFitRatio, scaleToFitRatio)
-            instruction.setTransform(CGAffineTransformConcat(assetTrack.preferredTransform, scaleFactor),
-                                     atTime: kCMTimeZero)
+            let xFix = CGFloat(((assetTrack.naturalSize.width - fixedVideoSize.height*scaleToFitRatio)/2))
+            let transform1 = CGAffineTransformConcat(assetTrack.preferredTransform, scaleFactor)
+            let transform2 = CGAffineTransformConcat(transform1,CGAffineTransformMakeTranslation(xFix,0))
+            instruction.setTransform(transform2,atTime: kCMTimeZero)
         } else {
+            scaleToFitRatio = fixedVideoSize.width / assetTrack.naturalSize.width
             let scaleFactor = CGAffineTransformMakeScale(scaleToFitRatio, scaleToFitRatio)
-            var concat = CGAffineTransformConcat(CGAffineTransformConcat(assetTrack.preferredTransform, scaleFactor), CGAffineTransformMakeTranslation(0, UIScreen.mainScreen().bounds.width / 2))
+            let yFix = CGFloat((fixedVideoSize.height - (assetTrack.naturalSize.height/scaleToFitRatio))/2)
+            var concat = CGAffineTransformConcat(CGAffineTransformConcat(assetTrack.preferredTransform, scaleFactor), CGAffineTransformMakeTranslation(0, yFix))
             if assetInfo.orientation == .Down {
                 let fixUpsideDown = CGAffineTransformMakeRotation(CGFloat(M_PI))
                 let windowBounds = UIScreen.mainScreen().bounds
